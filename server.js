@@ -20,21 +20,19 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// GET Route for /place_order
-app.get('/place_order', (req, res) => {
-    res.status(200).send(`
-        <h1>Place Order Endpoint</h1>
-        <p>This endpoint only supports <strong>POST</strong> requests for placing orders.</p>
-    `);
-});
-
-// POST Route to handle order submission
+// Route to handle order submission
 app.post('/place_order', (req, res) => {
-    console.log('Received order data:', req.body); // Debug log for incoming request
+    // Log the incoming request body to check the data format
+    console.log('Received order data:', req.body);
 
     const { items, room_number, userEmail } = req.body;
 
     const restaurant_email = process.env.EMAIL_USER; // Restaurant's email
+
+    // Log the incoming request for debugging (only in development mode)
+    if (process.env.NODE_ENV === 'development') {
+        console.log('Received order:', req.body);
+    }
 
     // Validate required fields
     if (!Array.isArray(items) || items.length === 0 || !userEmail) {
@@ -57,7 +55,7 @@ app.post('/place_order', (req, res) => {
         to: restaurant_email,         // Restaurant's email
         subject: 'New Order Received',
         html: orderSummary,           // Order details
-        replyTo: userEmail,           // Optional reply-to for restaurant
+        replyTo: userEmail,          // Optional reply-to for restaurant
     };
 
     // Send email
@@ -76,7 +74,6 @@ app.get('/', (req, res) => {
     res.status(200).send(`
         <h1>Welcome to the Restaurant Backend API!</h1>
         <p>Use <code>POST /place_order</code> to place an order.</p>
-        <p>Use <code>GET /place_order</code> to check endpoint details.</p>
     `);
 });
 
